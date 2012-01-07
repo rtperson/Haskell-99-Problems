@@ -42,8 +42,10 @@ rnd_select_one xs = do
     return [(xs!!n')]
 
 -- this version allows resampling. 
-rnd_select :: Int -> [a] -> IO [[a]]
-rnd_select n xs = sequence (replicate n (rnd_select_one xs))
+rnd_select :: [a] -> Int -> IO [a]
+rnd_select xs n = do 
+  xs <- replicateM n (rnd_select_one xs)
+  return (foldl (++) [] xs)      
 
 -- Ideally, to prevent re-sampling, we would use partition from Data.List
 -- like so: 
@@ -68,3 +70,4 @@ rnd_select' n xs
 main = do
     putStrLn list
     putStrLn $ insertAt 'M' list 4
+    --rnd_select  3 "abcdefgh" >>= putStrLn
