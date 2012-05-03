@@ -86,4 +86,4 @@ rnd_select' xs n
 main = do
     putStrLn list
     putStrLn $ insertAt 'M' list 4
-    rnd_select list 3 >>= putStrLn
+    rnd_select  3 "abcdefgh" >>= putStrLn
