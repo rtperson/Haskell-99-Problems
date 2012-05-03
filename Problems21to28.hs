@@ -1,3 +1,5 @@
+{-# LANGUAGE DoRec #-}
+
 import Data.List
 import System.Random
 import Control.Monad
@@ -38,33 +40,50 @@ range n k | n <= k = [n..k]
 rnd_select_one :: [a] -> IO [a]
 rnd_select_one xs = do
     let len = (length xs) - 1
-    n' <- randomRIO (0, len)
-    return [(xs!!n')]
+    n <- randomRIO (0, len)
+    return [(xs!!n)]
 
 -- this version allows resampling. 
-rnd_select :: Int -> [a] -> IO [[a]]
-rnd_select n xs = sequence (replicate n (rnd_select_one xs))
+rnd_select :: [a] -> Int -> IO [a]
+rnd_select xs n = do
+    g <- sequence (replicate n (rnd_select_one xs))
+    return (concat g)
 
 -- Ideally, to prevent re-sampling, we would use partition from Data.List
 -- like so: 
 -- partition (`elem` "g") "abcdefghijklmn"
 --  --> ("g", "abcdefhijklmn")
 
-rnd_select_one' :: Eq a => [a] -> IO (a, [a])
-rnd_select_one' xs = do
+-- we have a recursive relation now in the following code, 
+-- in that the following works:
+-- (acc, list')    <- rnd_select_one ([], list)
+-- (acc', list'')  <- rnd_select_one (acc, list')
+-- (acc'', list''') <- rnd_select_one (acc', list'')
+--
+-- This will select without resampling, so obviously the 
+-- only problem remaining is how to recursively call 
+-- rnd_select_one within a monad.
+
+rnd_select_one' :: Eq a => ([a], [a]) -> IO ([a], [a])
+rnd_select_one' (acc, []) = return (acc, [])
+rnd_select_one' (acc, xs) = do
     let len = (length xs) - 1
-    n' <- randomRIO (0, len)
-    let el = (xs!!n')
-    let fil = filter (/= el) xs
-    return (el,fil)
+    n <- randomRIO (0, len)
+    let el = (xs!!n)
+    let (g, ys) = partition (`elem` [el]) xs
+    return (acc ++ g, ys)
 
-rnd_select' n xs 
-    | n > (length xs) = xs
-        
-    
-
+rnd_select' :: Eq a => [a] -> Int -> IO [a]
+rnd_select' xs n
+    | n >= (length xs) = return xs
+    | otherwise        = undefined
+{--
+        (j, js) <- rnd_select_one' xs
+        return (j ++ (rnd_select' xs (n-1)))
+        --}
 
     
 main = do
     putStrLn list
     putStrLn $ insertAt 'M' list 4
+    rnd_select list 3 >>= putStrLn
