@@ -64,28 +64,24 @@ rnd_select xs n = do
 -- only problem remaining is how to recursively call 
 -- rnd_select_one within a monad.
 
-rnd_select_one' :: Eq a => Int -> ([a], [a]) -> IO ([a], [a])
-rnd_select_one' 0 (acc, xs) = return (acc, xs)
-rnd_select_one' _ (acc, []) = return (acc, [])
-rnd_select_one' n (acc, xs) = do
+rnd_select_one' :: Eq a => ([a], [a]) -> Int -> IO ([a], [a])
+rnd_select_one' (acc, xs) 0 = return (acc, xs)
+rnd_select_one' (acc, []) _ = return (acc, [])
+rnd_select_one' (acc, xs) n = do
     let len = (length xs) - 1
     d <- randomRIO (0, len)
     let el = (xs!!d)
     let (g, ys) = partition (`elem` [el]) xs
     let ret = (acc ++ g, ys)
-    rnd_select_one' (n-1) ret
+    rnd_select_one' ret (n-1) 
 
 rnd_select' :: Eq a => [a] -> Int -> IO [a]
 rnd_select' xs n = do
-    j <- rnd_select_one' n ([], xs)
+    j <- rnd_select_one' ([], xs) n
     return $ fst j
-{--
-        (j, js) <- rnd_select_one' xs
-        return (j ++ (rnd_select' xs (n-1)))
-        --}
 
     
 main = do
     putStrLn list
     putStrLn $ insertAt 'M' list 4
-    --rnd_select  3 "abcdefgh" >>= putStrLn
+    rnd_select' "abcdefgh" 3 >>= putStrLn
