@@ -47,20 +47,13 @@ rnd_select xs n = do
     g <- sequence (replicate n (rnd_select_one xs))
     return (concat g)
 
--- Ideally, to prevent re-sampling, we would use partition from Data.List
+-- Here's how to prevent re-sampling, using partition from Data.List
 -- like so: 
 -- partition (`elem` "g") "abcdefghijklmn"
 --  --> ("g", "abcdefhijklmn")
-
--- we have a recursive relation now in the following code, 
--- in that the following works:
--- (acc, list')    <- rnd_select_one ([], list)
--- (acc', list'')  <- rnd_select_one (acc, list')
--- (acc'', list''') <- rnd_select_one (acc', list'')
 --
--- This will select without resampling, so obviously the 
--- only problem remaining is how to recursively call 
--- rnd_select_one within a monad.
+-- It would also be fairly trivial to use removeAt from Problem 20
+
 
 rnd_select_one' :: Eq a => ([a], [a]) -> Int -> IO ([a], [a])
 rnd_select_one' (acc, xs) 0 = return (acc, xs)
@@ -79,7 +72,7 @@ rnd_select' xs n = do
     return $ fst j
     
 {-
-    4 Problem 24
+    Problem 24
     Lotto: Draw N different random numbers from the set 1..M.
 
     Example:
@@ -92,6 +85,19 @@ diff_select :: Int -> Int -> IO [Int]
 diff_select n m = do
     g <- getStdGen
     return (take n $ randomRs (1, m) g)
+    
+{-
+    Problem 25
+    Generate a random permutation of the elements of a list.
+
+    Example:
+
+    Prelude>rnd_permu "abcdef"
+    Prelude>"badcef"
+-}
+
+rnd_permu :: [a] -> [a]
+rnd_permu = undefined
     
 
     
