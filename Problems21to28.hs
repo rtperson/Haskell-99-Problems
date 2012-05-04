@@ -94,10 +94,13 @@ diff_select n m = do
 
     Prelude>rnd_permu "abcdef"
     Prelude>"badcef"
+    
+    This is essentially the same as randomization without resampling,
+    so it's already solved.
 -}
 
-rnd_permu :: [a] -> [a]
-rnd_permu = undefined
+rnd_permu :: Eq a => [a] -> IO [a]
+rnd_permu xs = rnd_select' xs (length xs)
     
 
     
