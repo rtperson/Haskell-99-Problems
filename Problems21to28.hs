@@ -1,5 +1,3 @@
-{-# LANGUAGE DoRec #-}
-
 import Data.List
 import System.Random
 import Control.Monad
@@ -79,6 +77,22 @@ rnd_select' :: Eq a => [a] -> Int -> IO [a]
 rnd_select' xs n = do
     j <- rnd_select_one' ([], xs) n
     return $ fst j
+    
+{-
+    4 Problem 24
+    Lotto: Draw N different random numbers from the set 1..M.
+
+    Example:
+
+    Prelude System.Random>diff_select 6 49
+    Prelude System.Random>[23,1,17,33,21,37]
+-}
+
+diff_select :: Int -> Int -> IO [Int]
+diff_select n m = do
+    g <- getStdGen
+    return (take n $ randomRs (1, m) g)
+    
 
     
 main = do
