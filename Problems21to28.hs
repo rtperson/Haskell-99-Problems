@@ -102,7 +102,17 @@ diff_select n m = do
 rnd_permu :: Eq a => [a] -> IO [a]
 rnd_permu xs = rnd_select' xs (length xs)
     
+{-
+    Problem 26
+    Generate the combinations of K distinct objects chosen from the N elements of a list
 
+    Example:
+
+    Prelude> combinations 3 "abcdef"
+    Prelude> ["abc","abd","abe",...]
+    
+    N choose K problems are awesome! 
+-}
     
 main = do
     putStrLn list
